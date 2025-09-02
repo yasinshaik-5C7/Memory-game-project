@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Card Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #27ff32, hsl(14, 98%, 49%), blue);
+      height: 120vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      color: #ffffff;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-gap: 15px;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background: #0000009d;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: transparent;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .card.flipped {
+      background: #fff;
+      color: #000;
+      transform: rotateY(180deg);
+    }
+
+    .card.matched {
+      background: #4caf50;
+      color: #fff;
+      cursor: default;
+    }
+   
+
+    #reset {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #ff0000;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #reset:hover {
+      background: #046f62;
+    }
+  </style>
+</head>
+<body>
+  <i><h1>Memory Power </h1></i>
+  <div class="game-board" id="gameBoard"></div>
+  <button id="reset">Restart Game</button>
+
+  <script>
+    const board = document.getElementById("gameBoard");
+    const resetBtn = document.getElementById("reset");
+
+    // Emoji cards
+    const emojis = ["🍎", "🍌", "🍇", "🍓", "🍒", "🍍", "🥝", "🍉"];
+    let cards = [...emojis, ...emojis]; // duplicate to make pairs
+
+    let flippedCards = [];
+    let matchedCount = 0;
+
+    // Shuffle cards
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    // Create game board
+    function createBoard() {
+      board.innerHTML = "";
+      cards = shuffle(cards);
+      cards.forEach((emoji, index) => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.dataset.emoji = emoji;
+        card.dataset.index = index;
+        card.textContent = emoji;
+        card.addEventListener("click", flipCard);
+        board.appendChild(card);
+      });
+    }
+
+    // Flip card
+    function flipCard() {
+      if (
+        flippedCards.length < 2 &&
+        !this.classList.contains("flipped") &&
+        !this.classList.contains("matched")
+      ) {
+        this.classList.add("flipped");
+        flippedCards.push(this);
+
+        if (flippedCards.length === 2) {
+          checkMatch();
+        }
+      }
+    }
+
+    // Check match
+    function checkMatch() {
+      const [card1, card2] = flippedCards;
+      if (card1.dataset.emoji === card2.dataset.emoji) {
+        card1.classList.add("matched");
+        card2.classList.add("matched");
+        matchedCount += 2;
+        if (matchedCount === cards.length) {
+          setTimeout(() => alert("🎉 You won!"), 500);
+        }
+      } else {
+        setTimeout(() => {
+          card1.classList.remove("flipped");
+          card2.classList.remove("flipped");
+        }, 800);
+      }
+      flippedCards = [];
+    }
+
+    // Reset game
+    resetBtn.addEventListener("click", () => {
+      matchedCount = 0;
+      flippedCards = [];
+      createBoard();
+    });
+
+    // Start game
+    createBoard();
+  </script>
+</body>
+</html>
